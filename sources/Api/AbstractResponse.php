@@ -59,6 +59,8 @@ abstract class _AbstractResponse
         $statusCode = $response->httpResponseCode;
 
         if ( in_array( $statusCode, $this->successCodes ) ) {
+            if ($tryingAfterRateLimit) \IPS\Log::log( "Request success after {$attempt} attempts", 'discord_exception' );
+            
             return $response->decodeJson();
         }
 
@@ -67,8 +69,7 @@ abstract class _AbstractResponse
         } catch ( Exception\NotFoundException $e ) {
             /* Ignore not found exceptions as members can leave discord any time etc. */
         } catch ( \Exception $e ) {
-            \IPS\Log::log( $response->decodeJson(), 'discord_exception' );
-
+            
             // Josh Added
             $reponseJson = $response->decodeJson();
 
@@ -89,6 +90,8 @@ abstract class _AbstractResponse
 
                 return $this->handleApi(true, $attempt);
             }
+
+            \IPS\Log::log( $response->decodeJson(), 'discord_exception' );
 
             throw $e;
         }
