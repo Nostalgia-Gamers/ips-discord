@@ -83,7 +83,7 @@ abstract class _AbstractResponse
                 
                 sleep($retryAfter);
 
-                return $this->handleApi();
+                return $this->handleApi(true);
             }
 
             throw $e;
