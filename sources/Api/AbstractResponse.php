@@ -50,11 +50,11 @@ abstract class _AbstractResponse
      * @return array|NULL
      * @throws \Exception
      */
-    protected function handleApi($tryingAfterRateLimit = false)
+    protected function handleApi($tryingAfterRateLimit = false, $attempt = 0)
     {
         $response = $this->api->send();
 
-        if ($tryingAfterRateLimit)  \IPS\Log::log( 'Attempting to retry after being rate limited.', 'discord_exception' );
+        if ($tryingAfterRateLimit)  \IPS\Log::log( 'Attempting to retry after being rate limited. Attempt: ' . $attempt, 'discord_exception' );
 
         $statusCode = $response->httpResponseCode;
 
@@ -73,9 +73,11 @@ abstract class _AbstractResponse
             $reponseJson = $response->decodeJson();
 
             $reponseHeaders = $response->httpHeaders;
+            
+            $maxAttempts = 5;
 
             // Do something if rate limit  
-            if ($reponseHeaders['X-RateLimit-Remaining'] == 0)
+            if (isset($reponseHeaders['X-RateLimit-Remaining']) && $reponseHeaders['X-RateLimit-Remaining'] == 0 && $attempt <= $maxAttempts)
             {
                 $retryAfter = $reponseJson['retry_after'] / 1000;
 
@@ -83,7 +85,9 @@ abstract class _AbstractResponse
                 
                 sleep($retryAfter);
 
-                return $this->handleApi(true);
+                $attempt = $attempt + 1;
+
+                return $this->handleApi(true, $attempt);
             }
 
             throw $e;
