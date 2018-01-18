@@ -1,0 +1,37 @@
+{
+    "1": {
+        "method": "addColumn",
+        "params": [
+            "core_members",
+            {
+                "name": "discord_id",
+                "type": "VARCHAR",
+                "length": 64,
+                "default": null
+            }
+        ]
+    },
+    "2": {
+        "method": "addColumn",
+        "params": [
+            "core_members",
+            {
+                "name": "discord_token",
+                "type": "TEXT",
+                "default": null
+            }
+        ]
+    },
+    "3": {
+        "method": "addColumn",
+        "params": [
+            "core_groups",
+            {
+                "name": "discord_role",
+                "type": "VARCHAR",
+                "length": 64,
+                "default": ""
+            }
+        ]
+    }
+}

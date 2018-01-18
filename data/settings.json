@@ -1,0 +1,30 @@
+[
+    {
+        "key": "discord_bot_token",
+        "default": ""
+    },
+    {
+        "key": "discord_client_id",
+        "default": ""
+    },
+    {
+        "key": "discord_client_secret",
+        "default": ""
+    },
+    {
+        "key": "discord_guild_id",
+        "default": ""
+    },
+    {
+        "key": "discord_remove_unmapped",
+        "default": "0"
+    },
+    {
+        "key": "discord_sync_bans",
+        "default": "0"
+    },
+    {
+        "key": "discord_sync_names",
+        "default": "0"
+    }
+]
