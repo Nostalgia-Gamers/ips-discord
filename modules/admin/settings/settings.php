@@ -99,7 +99,7 @@ class _settings extends \IPS\Dispatcher\Controller
             }
             else
             {
-                $redirect = \IPS\Http\Url::internal( 'app=discord&module=settings&controller=settings' );
+                $redirect = \IPS\Http\Url::internal( 'app=discord&module=settings&controller=settings' ); // Redirect back to admin panel
             }
 
             $form->saveAsSettings( $values );

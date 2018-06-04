@@ -37,6 +37,26 @@ class _Discord extends LoginAbstract
             );
     }
 
+    
+    /**
+     * Get API data
+     *
+     * @return array
+     * @throws \Exception
+     */
+    protected function get()
+    {
+        $discordMember = new \IPS\discord\Api\Member;
+        $userData = $discordMember->getDiscordUser( $this->authToken );
+
+        if ( !$userData['verified'] )
+        {
+            throw new \IPS\discord\Api\Exception\NotVerifiedException();
+        }
+
+        return $userData;
+    }
+
     /**
      * Authenticate
      *
@@ -150,6 +170,130 @@ class _Discord extends LoginAbstract
         /* No config is needed here, all information is retrieved from the application settings. */
         return [];
     }
+
+    /**
+	 * Show in Account Settings
+	 *
+	 * @param	\IPS\Member|NULL	$member	The member, or NULL for if it should show generally
+	 * @return	bool
+	 */
+	public function showInUcp( \IPS\Member $member = NULL )
+	{		
+	    $member = \IPS\Member::loggedIn();
+	    
+		return $member;
+    }
+    
+    /**
+     * Logo for account settings, waiting for IPB to upgrade FontAwesome version - then we can use 'Discord' icon
+     */
+    public function logoForUcp()
+	{
+		return 'gamepad';
+    }
+    
+    /**
+     * Get user data
+     *
+     * @return	array
+     */
+    protected function user()
+    {
+        $member = \IPS\Member::loggedIn();
+        
+        if ( $this->user === NULL && $member->discord_token )
+        {
+            try
+            {
+                $response = \IPS\Http\Url::external( \IPS\discord\Api::OAUTH2_URL . 'token' )->request()->post( [
+                    'client_id'		=> \IPS\Settings::i()->discord_client_id,
+                    'client_secret'	=> \IPS\Settings::i()->discord_client_secret,
+                    'refresh_token'	=> $member->discord_token,
+                    'grant_type'	=> 'refresh_token'
+                ] )->decodeJson();
+
+                if ( isset( $response['access_token'] ) )
+                {
+                    $this->authToken = $response['access_token'];
+                    $this->user = $this->get();
+                }
+
+                /* Sync roles */
+                $guildMember = new \IPS\discord\Api\GuildMember;
+                //$guildMember->update( $member );
+            }
+            catch ( \IPS\Http\Request\Exception $e )
+            {
+                $member->discord_token = NULL;
+                //$member->save();
+
+                \IPS\Log::log( $e, 'discord' );
+            }
+            catch ( \IPS\discord\Api\Exception\NotVerifiedException $e )
+            {
+                $member->discord_token = NULL;
+                //$member->save();
+
+                \IPS\Log::log( $e, 'discord' );
+
+                \IPS\Output::i()->error( 'discord_not_verified', '' );
+            }
+        }
+
+        return $this->user;
+    }
+
+    /**
+	 * Get user's profile name
+	 * May return NULL if server doesn't support this
+	 *
+	 * @param	\IPS\Member	$member	Member
+	 * @return	string|NULL
+	 * @throws	\IPS\Login\Exception	The token is invalid and the user needs to reauthenticate
+	 * @throws	\DomainException		General error where it is safe to show a message to the user
+	 * @throws	\RuntimeException		Unexpected error from service
+	 */
+	public function userProfileName( \IPS\Member $member )
+	{
+        $user = $this->user();
+
+        if ( isset( $user['username'] ) )
+        {
+            return $user['username'];
+        }
+
+        return NULL;
+	}
+
+
+    /**
+	 * Get user's profile photo
+	 * May return NULL if server doesn't support this
+	 *
+	 * @param	\IPS\Member	$member	Member
+	 * @return	\IPS\Http\Url|NULL
+	 * @throws	\IPS\Login\Exception	The token is invalid and the user needs to reauthenticate
+	 * @throws	\DomainException		General error where it is safe to show a message to the user
+	 * @throws	\RuntimeException		Unexpected error from service
+	 */
+	public function userProfilePhoto( \IPS\Member $member )
+	{
+        try
+        {
+            $user = $this->user();
+    
+            if ( isset( $user['avatar'] ) && !empty( $user['avatar'] ) )
+            {
+                return \IPS\Http\Url::external( \IPS\discord\Api::API_URL . "users/{$user['id']}/avatars/{$user['avatar']}.jpg" );
+            }
+        }
+        catch ( \IPS\Http\Request\Exception $e )
+        {
+            \IPS\Log::log( $e, 'discord' );
+        }
+        return NULL;
+	}
+
 
     /**
      * Test Settings
