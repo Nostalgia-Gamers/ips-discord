@@ -1,4 +1,4 @@
-### Support for 4.3.3
+### Support for 4.3.*
 
 The originally developer of this plugin seems to have abandoned the project, I have made modifications to support 4.3.*. They may not be perfect, but they seem to work. 
 
@@ -11,9 +11,7 @@ I have added support for better handling of Discords rate limits, this helps syn
 ### Information
 
 * This is a Discord Integration for IPS 4.3.x.
-* Tested on >= 4.3.3, might work on older versions but those are not supported.
-* If Installing using GitHub, create a directory called 'discord' in applications, then place these files into that new directory then install as normal. ie; {IPSPATH}/applications/discord/{these files}
-
+* Tested on 4.3.3, might work on older versions
 
 ### Installation
 
