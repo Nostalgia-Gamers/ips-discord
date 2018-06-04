@@ -23,3 +23,10 @@ I have added support for better handling of Discords rate limits, this helps syn
 * OAUTH2 authentication for IPS.
 * Ban syncing.
 * Post automated notifications to channels about new topics/posts.
+
+### Known Issues
+
+- Logging out / disassociating doesn't appear to work currently
+- No settings for enabling/disable profile picture sync
+
+Open to pull requests for these issues.
