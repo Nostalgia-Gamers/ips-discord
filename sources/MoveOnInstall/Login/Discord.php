@@ -254,9 +254,6 @@ class _Discord extends LoginAbstract
 	 *
 	 * @param	\IPS\Member	$member	Member
 	 * @return	string|NULL
-	 * @throws	\IPS\Login\Exception	The token is invalid and the user needs to reauthenticate
-	 * @throws	\DomainException		General error where it is safe to show a message to the user
-	 * @throws	\RuntimeException		Unexpected error from service
 	 */
 	public function userProfileName( \IPS\Member $member )
 	{
@@ -269,7 +266,6 @@ class _Discord extends LoginAbstract
 
         return NULL;
 	}
-
 
     /**
 	 * Get user's profile photo

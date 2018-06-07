@@ -39,7 +39,7 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	array
      */
-    protected function user(\IPS\Member $member = NULL)
+    protected function user()
     {
         if ( $this->user === NULL && $this->member->discord_token )
         {
@@ -89,19 +89,19 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	bool
      */
-    public function connected(\IPS\Member $member = NULL)
+    public function connected()
     {
         return (bool) ( $this->member->discord_id && $this->member->discord_token );
     }
 
     /**
-     * Get name
+     * Get user's name from discord
      *
-     * @return	string
+     * @return string|NULL
      */
-    public function name(\IPS\Member $member = NULL)
+    public function name()
     {
-        $user = $this->user($member);
+        $user = $this->user();
 
         if ( isset( $user['username'] ) )
         {
@@ -112,11 +112,39 @@ class _Discord extends ProfileSyncAbstract
     }
 
     /**
+	 * Get user's profile photo
+	 * May return NULL if server doesn't support this
+	 *
+	 * @param	\IPS\Member	$member	Member
+	 * @return	\IPS\Http\Url|NULL
+	 * @throws	\IPS\Login\Exception	The token is invalid and the user needs to reauthenticate
+	 * @throws	\DomainException		General error where it is safe to show a message to the user
+	 * @throws	\RuntimeException		Unexpected error from service
+	 */
+	public function photo()
+	{
+        try
+        {
+            $user = $this->user();
+    
+            if ( isset( $user['avatar'] ) && !empty( $user['avatar'] ) )
+            {
+                return \IPS\Http\Url::external( \IPS\discord\Api::API_URL . "users/{$user['id']}/avatars/{$user['avatar']}.jpg" );
+            }
+        }
+        catch ( \IPS\Http\Request\Exception $e )
+        {
+            \IPS\Log::log( $e, 'discord' );
+        }
+        return NULL;
+	}
+
+    /**
      * Disassociate
      *
      * @return	void
      */
-    protected function _disassociate(\IPS\Member $member = NULL)
+    protected function _disassociate()
     {
         $this->member->discord_id = 0;
         $this->member->discord_token = NULL;
