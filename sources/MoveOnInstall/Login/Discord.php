@@ -139,11 +139,10 @@ class _Discord extends LoginAbstract
                 $discordMember = new \IPS\discord\Api\Member;
                 $member->discord_id = $userData['id'];
                 $member->discord_token = $response['access_token'];
+
+                if ( isset( $response['refresh_token'] ) ) $member->discord_token = $response['refresh_token'];
+
                 $member->save();
-        
-                /* Sync member */
-                $guildMember = new \IPS\discord\Api\GuildMember;
-                $guildMember->update( $member );
             }
 
             /* Sync user */
