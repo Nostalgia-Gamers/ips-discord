@@ -16,6 +16,11 @@ class _Discord extends LoginAbstract
      */
     public static $icon = 'lock';
 
+    	/**
+	 * @brief    User data
+	 */
+	protected $user = NULL;
+
     /**
      * Get Form
      *
@@ -197,18 +202,18 @@ class _Discord extends LoginAbstract
      *
      * @return	array
      */
-    protected function user()
+    protected function user(\IPS\Member $member = NULL)
     {
-        $member = \IPS\Member::loggedIn();
+        // $member = \IPS\Member::loggedIn();
         
-        if ( $this->user === NULL && $member->discord_token )
+        if ( $this->user === NULL && $this->member->discord_token )
         {
             try
             {
                 $response = \IPS\Http\Url::external( \IPS\discord\Api::OAUTH2_URL . 'token' )->request()->post( [
                     'client_id'		=> \IPS\Settings::i()->discord_client_id,
                     'client_secret'	=> \IPS\Settings::i()->discord_client_secret,
-                    'refresh_token'	=> $member->discord_token,
+                    'refresh_token'	=> $this->member->discord_token,
                     'grant_type'	=> 'refresh_token'
                 ] )->decodeJson();
 
@@ -220,19 +225,19 @@ class _Discord extends LoginAbstract
 
                 /* Sync roles */
                 $guildMember = new \IPS\discord\Api\GuildMember;
-                //$guildMember->update( $member );
+                $guildMember->update( $this->member );
             }
             catch ( \IPS\Http\Request\Exception $e )
             {
-                $member->discord_token = NULL;
-                //$member->save();
+                $this->member->discord_token = NULL;
+                $this->member->save();
 
                 \IPS\Log::log( $e, 'discord' );
             }
             catch ( \IPS\discord\Api\Exception\NotVerifiedException $e )
             {
-                $member->discord_token = NULL;
-                //$member->save();
+                $this->member->discord_token = NULL;
+                $this->member->save();
 
                 \IPS\Log::log( $e, 'discord' );
 
@@ -255,7 +260,7 @@ class _Discord extends LoginAbstract
 	 */
 	public function userProfileName( \IPS\Member $member )
 	{
-        $user = $this->user();
+        $user = $this->user($member);
 
         if ( isset( $user['username'] ) )
         {
@@ -280,7 +285,7 @@ class _Discord extends LoginAbstract
 	{
         try
         {
-            $user = $this->user();
+            $user = $this->user($member);
     
             if ( isset( $user['avatar'] ) && !empty( $user['avatar'] ) )
             {

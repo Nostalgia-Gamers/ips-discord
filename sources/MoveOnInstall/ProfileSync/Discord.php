@@ -39,7 +39,7 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	array
      */
-    protected function user()
+    protected function user(\IPS\Member $member = NULL)
     {
         if ( $this->user === NULL && $this->member->discord_token )
         {
@@ -89,33 +89,9 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	bool
      */
-    public function connected()
+    public function connected(\IPS\Member $member = NULL)
     {
         return (bool) ( $this->member->discord_id && $this->member->discord_token );
-    }
-
-    /**
-     * Get photo
-     *
-     * @return	\IPS\Http\Url|\IPS\File|NULL
-     */
-    public function photo()
-    {
-        try
-        {
-            $user = $this->user();
-
-            if ( isset( $user['avatar'] ) && !empty( $user['avatar'] ) )
-            {
-                return \IPS\Http\Url::external( \IPS\discord\Api::API_URL . "users/{$user['id']}/avatars/{$user['avatar']}.jpg" );
-            }
-        }
-        catch ( \IPS\Http\Request\Exception $e )
-        {
-            \IPS\Log::log( $e, 'discord' );
-        }
-
-        return NULL;
     }
 
     /**
@@ -123,14 +99,16 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	string
      */
-    public function name()
+    public function name(\IPS\Member $member = NULL)
     {
-        $user = $this->user();
+        $user = $this->user($member);
 
         if ( isset( $user['username'] ) )
         {
             return $user['username'];
         }
+
+        return NULL;
     }
 
     /**
@@ -138,7 +116,7 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	void
      */
-    protected function _disassociate()
+    protected function _disassociate(\IPS\Member $member = NULL)
     {
         $this->member->discord_id = 0;
         $this->member->discord_token = NULL;
