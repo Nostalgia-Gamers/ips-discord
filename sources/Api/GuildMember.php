@@ -86,14 +86,14 @@ class _GuildMember extends \IPS\discord\Api\AbstractResponse
      */
     public function remove( \IPS\Member $member )
     {
-        $this->api->setUrl( \IPS\discord\Api::API_URL )
-            ->setAuthType( \IPS\discord\Api::AUTH_TYPE_BOT )
-            ->setMember( $member )
-            ->setUri( 'guilds/{guild.id}/members/{user.id}' )
-            ->setParams( [] )
-            ->setMethod( 'delete' );
+        // $this->api->setUrl( \IPS\discord\Api::API_URL )
+        //     ->setAuthType( \IPS\discord\Api::AUTH_TYPE_BOT )
+        //     ->setMember( $member )
+        //     ->setUri( 'guilds/{guild.id}/members/{user.id}' )
+        //     ->setParams( [] )
+        //     ->setMethod( 'delete' );
 
-        return $this->handleApi();
+        // return $this->handleApi();
     }
 
     /**
