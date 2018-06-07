@@ -70,7 +70,7 @@ class _Discord extends LoginAbstract
      * @return	\IPS\Member
      * @throws	\IPS\Login\Exception
      */
-    public function authenticate( $url, $member=NULL )
+    public function authenticate( $url, $member = NULL )
     {
         try
         {
@@ -116,17 +116,35 @@ class _Discord extends LoginAbstract
                 $memberProperties['discord_token'] = $response['refresh_token'];
             }
 
-            /* Find or create member */
-            $member = $this->createOrUpdateAccount(
-                $member ?: \IPS\Member::load( $userData['id'], 'discord_id' ),
-                $memberProperties,
-                $this->settings['real_name'] ? $userData['username'] : NULL,
-                $userData['email'],
-                $response['access_token'],
-                array(
-                    'photo' => TRUE,
-                )
-            );
+            $loggedInUser = \IPS\Member::loggedIn();
+
+			if ($loggedInUser->member_id === NULL)
+			{
+                /* Find or create member */
+                $member = $this->createOrUpdateAccount(
+                    $member ?: \IPS\Member::load( $userData['id'], 'discord_id' ),
+                    $memberProperties,
+                    $this->settings['real_name'] ? $userData['username'] : NULL,
+                    $userData['email'],
+                    $response['access_token'],
+                    array(
+                        'photo' => TRUE,
+                    )
+                );
+			} 
+			else 
+			{
+                $member = $loggedInUser;
+
+                $discordMember = new \IPS\discord\Api\Member;
+                $member->discord_id = $userData['id'];
+                $member->discord_token = $response['access_token'];
+                $member->save();
+        
+                /* Sync member */
+                $guildMember = new \IPS\discord\Api\GuildMember;
+                $guildMember->update( $member );
+            }
 
             /* Sync user */
             $guildMember = new \IPS\discord\Api\GuildMember;
@@ -204,8 +222,8 @@ class _Discord extends LoginAbstract
      */
     protected function user(\IPS\Member $member = NULL)
     {
-        // $member = \IPS\Member::loggedIn();
-        
+        if ( $member != NULL ) $this->member = $member;
+
         if ( $this->user === NULL && $this->member->discord_token )
         {
             try
@@ -257,7 +275,7 @@ class _Discord extends LoginAbstract
 	 */
 	public function userProfileName( \IPS\Member $member )
 	{
-        $user = $this->user($member);
+        $user = $this->user( $member );
 
         if ( isset( $user['username'] ) )
         {
@@ -281,7 +299,7 @@ class _Discord extends LoginAbstract
 	{
         try
         {
-            $user = $this->user($member);
+            $user = $this->user( $member );
     
             if ( isset( $user['avatar'] ) && !empty( $user['avatar'] ) )
             {

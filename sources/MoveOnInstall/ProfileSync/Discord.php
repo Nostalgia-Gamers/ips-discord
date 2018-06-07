@@ -39,7 +39,7 @@ class _Discord extends ProfileSyncAbstract
      *
      * @return	array
      */
-    protected function user()
+    protected function user(\IPS\Member $member = NULL)
     {
         if ( $this->user === NULL && $this->member->discord_token )
         {
@@ -146,10 +146,11 @@ class _Discord extends ProfileSyncAbstract
      */
     protected function _disassociate()
     {
-        $this->member->discord_id = 0;
+        $this->member->discord_id = NULL;
         $this->member->discord_token = NULL;
         $this->member->save();
     }
+
 
     /**
      * Get API data
