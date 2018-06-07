@@ -1,6 +1,6 @@
 ### Support for 4.3.*
 
-The original developer of this plugin abandoned the project so I have create a new repository for this project and made modifications to support 4.3.*. They may not be perfect, but they seem to work.
+The original developer of this plugin abandoned the project so I have created a new repository for this project and made modifications to support 4.3.*. They may not be perfect, but they seem to work.
 
 * I am open to contributions and will review pull-requests
 
