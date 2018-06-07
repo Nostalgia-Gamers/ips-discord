@@ -1,6 +1,6 @@
 ### Support for 4.3.*
 
-The originally developer of this plugin seems to have abandoned the project, I have made modifications to support 4.3.*. They may not be perfect, but they seem to work. 
+The original developer of this plugin abandoned the project, I have forked this and made modifications to support 4.3.*. They may not be perfect, but they seem to work.
 
 * I am open to contributions and will review pull-requests
 
@@ -26,7 +26,7 @@ I have added support for better handling of Discords rate limits, this helps syn
 
 ### Known Issues
 
-- Logging out / disassociating doesn't appear to work currently
+- Disassociating discord doesn't appear to work currently
 - No settings for enabling/disable profile picture sync
 
 Open to pull requests for these issues.
